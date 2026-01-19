@@ -67,7 +67,7 @@ The count is: {{ count }}
 </style>
 ```
 
-:::warning 避免在 Markdown 中使用 `<style scoped>`
+::: warning 避免在 Markdown 中使用 `<style scoped>`
 在 Markdown 中使用时，`<style scoped>` 需要为当前页面的每个元素添加特殊属性，这将显著增加页面的大小。当我们需要局部范围的样式时 `<style module>` 是首选。
 :::
 
@@ -224,7 +224,7 @@ npm install -D stylus
 
 ## 使用 teleport 传递组件内容 {#using-teleports}
 
-Vitepress 目前只有使用 teleport 传送到 body 的 SSG 支持。对于其他地方，可以将它们包裹在内置的 `<ClientOnly>` 组件中，或者通过 [postRender 钩子](../reference/site-config#postrender)将 teleport 标签注入到最终页面 HTML 中的正确位置。
+VitePress 目前只有使用 teleport 传送到 body 的 SSG 支持。对于其他地方，可以将它们包裹在内置的 `<ClientOnly>` 组件中，或者通过 [postRender 钩子](../reference/site-config#postrender)将 teleport 标签注入到最终页面 HTML 中的正确位置。
 
 <ModalDemo />
 

@@ -44,7 +44,7 @@ VitePress 带有内置的 Markdown 扩展。
 ```md
 [Home](/) <!-- 将用户导航至根目录下的 index.html -->
 [foo](/foo/) <!-- 将用户导航至目录 foo 下的 index.html -->
-[foo heading](./#heading) <!-- 将用户锚定到 foo 索引文件中的一个标题上 -->
+[foo heading](./#heading) <!-- 将用户锚定到目录 foo 下的index文件中的一个标题上 -->
 [bar - three](../bar/three) <!-- 可以省略扩展名 -->
 [bar - three](../bar/three.md) <!-- 可以添加 .md -->
 [bar - four](../bar/four.html) <!-- 或者可以添加 .html -->
@@ -233,7 +233,7 @@ export default defineConfig({
 
 ```md
 ::: raw
-Wraps in a <div class="vp-raw">
+Wraps in a `<div class="vp-raw">`
 :::
 ```
 
@@ -245,7 +245,7 @@ Wraps in a <div class="vp-raw">
   $ npm add -D postcss
   ```
 
-- 创建 `docs/.postcssrc.cjs` 文件并将以下内容添加到其中：
+- 创建 `docs/postcss.config.mjs` 文件并将以下内容添加到其中：
 
   ```js
   import { postcssIsolateStyles } from 'vitepress'
@@ -255,11 +255,11 @@ Wraps in a <div class="vp-raw">
   }
   ```
 
-  它在底层使用 [`postcss-prefix-selector`](https://github.com/postcss/postcss-load-config)。你可以像这样传递它的选项：
+  你可以像这样传递它的选项：
 
   ```js
   postcssIsolateStyles({
-    includeFiles: [/vp-doc\.css/] // 默认为 /base\.css/
+    includeFiles: [/custom\.css/] // 默认为 [/vp-doc\.css/, /base\.css/]
   })
   ```
 
@@ -343,7 +343,7 @@ export default {
 
 在 Shiki 的代码仓库中，可以找到[合法的编程语言列表](https://shiki.style/languages)。
 
-还可以全局配置中自定义语法高亮主题。有关详细信息，参见 [`markdown` 选项](../reference/site-config#markdown)得到更多信息。
+还可以在全局配置中自定义语法高亮主题、配置语言别名和自定义语言标签。有关详细信息，参见 [`markdown` 选项](../reference/site-config#markdown)得到更多信息。
 
 ## 在代码块中实现行高亮 {#line-highlighting-in-code-blocks}
 
@@ -840,14 +840,13 @@ Can be created using `.foorc.json`.
 
 ## 数学方程 {#math-equations}
 
-现在这是可选的。要启用它, 需要安装 `markdown-it-mathjax3`，在配置文件中设置`markdown.math` 为 `true`：
+现在这是可选的。要启用它，需要安装 `markdown-it-mathjax3`，在配置文件中设置`markdown.math` 为 `true`：
 
 ```sh
-npm add -D markdown-it-mathjax3
+npm add -D markdown-it-mathjax3@^4
 ```
 
-```ts
-// .vitepress/config.ts
+```ts [.vitepress/config.ts]
 export default {
   markdown: {
     math: true
@@ -891,7 +890,7 @@ $$ x = {-b \pm \sqrt{b^2-4ac} \over 2a} $$
 export default {
   markdown: {
     image: {
-      // 默认禁用图片懒加载
+      // 默认禁用；设置为 true 可为所有图片启用懒加载。
       lazyLoading: true
     }
   }

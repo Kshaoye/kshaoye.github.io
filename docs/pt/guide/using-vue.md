@@ -128,7 +128,7 @@ Se um componente for usado na maioria das páginas, eles podem ser registrados g
 Certifique-se de que o nome de um componente personalizado contenha um hífen ou esteja em PascalCase. Caso contrário, ele será tratado como um elemento alinhado e envolvido dentro de uma tag `<p>`, o que levará a uma incompatibilidade de hidratação pois `<p>` não permite que elementos de bloco sejam colocados dentro dele.
 :::
 
-### Usando Componentes Em Cabeçalhos <ComponenteNoCabeçalho /> {#using-components-in-headers}
+### Usando Componentes Em Cabeçalhos <ComponentInHeader /> {#using-components-in-headers}
 
 Você pode usar componentes Vue nos cabeçalhos, mas observe a diferença entre as seguintes sintaxes:
 
@@ -223,7 +223,7 @@ Então você pode usar o seguinte em Markdown e nos componentes do tema:
 
 ## Usando _Teleports_ {#using-teleports}
 
-Vitepress atualmente oferece suporte a SSG para _teleports_ apenas para o corpo. Para outros alvos, você pode envolvê-los dentro do componente embutido `<ClientOnly>` ou injetar a marcação de _teleport_ na localização correta em sua página final HTML por meio do [gancho `postRender`](../reference/site-config#postrender).
+VitePress atualmente oferece suporte a SSG para _teleports_ apenas para o corpo. Para outros alvos, você pode envolvê-los dentro do componente embutido `<ClientOnly>` ou injetar a marcação de _teleport_ na localização correta em sua página final HTML por meio do [gancho `postRender`](../reference/site-config#postrender).
 
 <ModalDemo />
 

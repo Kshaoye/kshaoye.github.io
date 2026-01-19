@@ -5,9 +5,26 @@ export type { DefaultTheme } from './default-theme.js'
 
 export type Awaitable<T> = T | PromiseLike<T>
 
+type DeepPartial<T> =
+  T extends Record<string, any>
+    ? T extends
+        | Date
+        | RegExp
+        | Function
+        | ReadonlyMap<any, any>
+        | ReadonlySet<any>
+        | ReadonlyArray<any>
+      ? T
+      : { [P in keyof T]?: DeepPartial<T[P]> }
+    : T
+
 export interface PageData {
   relativePath: string
-  filePath: string // differs from relativePath in case of path rewrites
+  /**
+   * differs from relativePath in case of path rewrites
+   * empty string if the page is virtual (e.g. 404 page)
+   */
+  filePath: string
   title: string
   titleTemplate?: string | boolean
   description: string
@@ -116,6 +133,7 @@ export interface SiteData<ThemeConfig = any> {
     | boolean
     | 'dark'
     | 'force-dark'
+    | 'force-auto'
     | (Omit<UseDarkOptions, 'initialValue'> & { initialValue?: 'dark' })
   themeConfig: ThemeConfig
   scrollOffset:
@@ -129,6 +147,9 @@ export interface SiteData<ThemeConfig = any> {
   router: {
     prefetchLinks: boolean
   }
+  additionalConfig?:
+    | AdditionalConfigDict<ThemeConfig>
+    | AdditionalConfigLoader<ThemeConfig>
 }
 
 export type HeadConfig =
@@ -142,6 +163,8 @@ export interface PageDataPayload {
 
 export interface SSGContext extends SSRContext {
   content: string
+  /** @experimental */
+  vpSocialIcons: Set<string>
 }
 
 export interface LocaleSpecificConfig<ThemeConfig = any> {
@@ -151,7 +174,7 @@ export interface LocaleSpecificConfig<ThemeConfig = any> {
   titleTemplate?: string | boolean
   description?: string
   head?: HeadConfig[]
-  themeConfig?: ThemeConfig
+  themeConfig?: DeepPartial<ThemeConfig>
 }
 
 export type LocaleConfig<ThemeConfig = any> = Record<
@@ -159,9 +182,20 @@ export type LocaleConfig<ThemeConfig = any> = Record<
   LocaleSpecificConfig<ThemeConfig> & { label: string; link?: string }
 >
 
+export type AdditionalConfig<ThemeConfig = any> =
+  LocaleSpecificConfig<ThemeConfig>
+
+export type AdditionalConfigDict<ThemeConfig = any> = Record<
+  string,
+  AdditionalConfig<ThemeConfig>
+>
+
+export type AdditionalConfigLoader<ThemeConfig = any> = (
+  relativePath: string
+) => AdditionalConfig<ThemeConfig>[] | void
+
 // Manually declaring all properties as rollup-plugin-dts
 // is unable to merge augmented module declarations
-
 export interface MarkdownEnv {
   /**
    * The raw Markdown content without frontmatter
@@ -196,4 +230,5 @@ export interface MarkdownEnv {
   links?: string[]
   includes?: string[]
   realPath?: string
+  localeIndex?: string
 }

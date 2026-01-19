@@ -1,10 +1,16 @@
-import type MarkdownIt from 'markdown-it'
+import type { MarkdownItAsync } from 'markdown-it-async'
 
 export interface Options {
-  hasSingleTheme: boolean
+  codeCopyButtonTitle: string
+  languageLabel?: Record<string, string>
 }
 
-export function preWrapperPlugin(md: MarkdownIt, options: Options) {
+export function preWrapperPlugin(md: MarkdownItAsync, options: Options) {
+  const langLabel = Object.fromEntries(
+    Object.entries(options.languageLabel || {}) //
+      .map(([k, v]) => [k.toLowerCase(), v])
+  )
+
   const fence = md.renderer.rules.fence!
   md.renderer.rules.fence = (...args) => {
     const [tokens, idx] = args
@@ -17,15 +23,16 @@ export function preWrapperPlugin(md: MarkdownIt, options: Options) {
     token.info = token.info.replace(/ active$/, '').replace(/ active /, ' ')
 
     const lang = extractLang(token.info)
-    const rawCode = fence(...args)
-    return `<div class="language-${lang}${getAdaptiveThemeMarker(
-      options
-    )}${active}"><button title="Copy Code" class="copy"></button><span class="lang">${lang}</span>${rawCode}</div>`
-  }
-}
+    const label = langLabel[lang.toLowerCase()] || lang.replace(/_/g, ' ')
 
-export function getAdaptiveThemeMarker(options: Options) {
-  return options.hasSingleTheme ? '' : ' vp-adaptive-theme'
+    return (
+      `<div class="language-${lang}${active}">` +
+      `<button title="${options.codeCopyButtonTitle}" class="copy"></button>` +
+      `<span class="lang">${label}</span>` +
+      fence(...args) +
+      '</div>'
+    )
+  }
 }
 
 export function extractTitle(info: string, html = false) {
@@ -37,12 +44,12 @@ export function extractTitle(info: string, html = false) {
   return info.match(/\[(.*)\]/)?.[1] || extractLang(info) || 'txt'
 }
 
-function extractLang(info: string) {
-  return info
-    .trim()
-    .replace(/=(\d*)/, '')
-    .replace(/:(no-)?line-numbers({| |$|=\d*).*/, '')
-    .replace(/(-vue|{| ).*$/, '')
-    .replace(/^vue-html$/, 'template')
-    .replace(/^ansi$/, '')
+function extractLang(info: string): string {
+  return (
+    /^[a-zA-Z0-9-_]+/
+      .exec(info)?.[0]
+      .replace(/-vue$/, '') // remove -vue suffix
+      .replace(/^vue-html$/, 'template')
+      .replace(/^ansi$/, '') || ''
+  )
 }

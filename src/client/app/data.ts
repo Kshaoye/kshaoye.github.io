@@ -1,17 +1,19 @@
 import siteData from '@siteData'
-import { useDark } from '@vueuse/core'
+import { useDark, usePreferredDark } from '@vueuse/core'
 import {
   computed,
   inject,
   readonly,
   ref,
   shallowRef,
+  watch,
   type InjectionKey,
   type Ref
 } from 'vue'
 import {
   APPEARANCE_KEY,
   createTitle,
+  inBrowser,
   resolveSiteDataByRoute,
   type PageData,
   type SiteData
@@ -47,21 +49,16 @@ export interface VitePressData<T = any> {
   dir: Ref<string>
   localeIndex: Ref<string>
   isDark: Ref<boolean>
+  /**
+   * Current location hash
+   */
+  hash: Ref<string>
 }
 
 // site data is a singleton
 export const siteDataRef: Ref<SiteData> = shallowRef(
-  (import.meta.env.PROD ? siteData : readonly(siteData)) as SiteData
+  readonly(siteData) as SiteData
 )
-
-// hmr
-if (import.meta.hot) {
-  import.meta.hot.accept('/@siteData', (m) => {
-    if (m) {
-      siteDataRef.value = m.default
-    }
-  })
-}
 
 // per-app data
 export function initData(route: Route): VitePressData {
@@ -73,14 +70,30 @@ export function initData(route: Route): VitePressData {
   const isDark =
     appearance === 'force-dark'
       ? ref(true)
-      : appearance
-        ? useDark({
-            storageKey: APPEARANCE_KEY,
-            initialValue: () =>
-              typeof appearance === 'string' ? appearance : 'auto',
-            ...(typeof appearance === 'object' ? appearance : {})
-          })
-        : ref(false)
+      : appearance === 'force-auto'
+        ? usePreferredDark()
+        : appearance
+          ? useDark({
+              storageKey: APPEARANCE_KEY,
+              initialValue: () => (appearance === 'dark' ? 'dark' : 'auto'),
+              ...(typeof appearance === 'object' ? appearance : {})
+            })
+          : ref(false)
+
+  const hashRef = ref(inBrowser ? location.hash : '')
+
+  if (inBrowser) {
+    window.addEventListener('hashchange', () => {
+      hashRef.value = location.hash
+    })
+  }
+
+  watch(
+    () => route.data,
+    () => {
+      hashRef.value = inBrowser ? location.hash : ''
+    }
+  )
 
   return {
     site,
@@ -95,7 +108,8 @@ export function initData(route: Route): VitePressData {
     description: computed(
       () => route.data.description || site.value.description
     ),
-    isDark
+    isDark,
+    hash: computed(() => hashRef.value)
   }
 }
 

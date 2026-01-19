@@ -10,7 +10,7 @@ Os guias a seguir são baseados em alguns pressupostos:
 - Você está usando o diretório de saída de compilação padrão (`.vitepress/dist`).
 - VitePress está instalado como uma dependência local em seu projeto, e você configurou os seguintes scripts em seu `package.json`:
 
-  ```json
+  ```json [package.json]
   {
     "scripts": {
       "docs:build": "vitepress build docs",
@@ -121,7 +121,7 @@ Não ative opções como _Auto Minify_ para código HTML. Isso removerá coment�
 
 1. Crie um arquivo chamado `deploy.yml` dentro do diretório `.github/workflows` do seu projeto com algum conteúdo como este:
 
-   ```yaml
+   ```yaml [.github/workflows/deploy.yml]
    # Exemplo de fluxo de trabalho para compilar e implantar um site VitePress no GitHub Pages
    #
    name: Implante o site VitePress no Pages
@@ -153,15 +153,17 @@ Não ative opções como _Auto Minify_ para código HTML. Isso removerá coment�
        runs-on: ubuntu-latest
        steps:
          - name: Checkout
-           uses: actions/checkout@v4
+           uses: actions/checkout@v5
            with:
              fetch-depth: 0 # Não necessário se lastUpdated não estiver habilitado
-         # - uses: pnpm/action-setup@v3 # Descomente isso se estiver usando pnpm
+         # - uses: pnpm/action-setup@v4 # Descomente isso se estiver usando pnpm
+         #   with:
+         #     version: 9
          # - uses: oven-sh/setup-bun@v1 # Descomente isso se estiver usando Bun
          - name: Setup Node
-           uses: actions/setup-node@v4
+           uses: actions/setup-node@v6
            with:
-             node-version: 20
+             node-version: 24
              cache: npm # ou pnpm / yarn
          - name: Setup Pages
            uses: actions/configure-pages@v4
@@ -204,7 +206,7 @@ Não ative opções como _Auto Minify_ para código HTML. Isso removerá coment�
 
 2. Crie um arquivo chamado `.gitlab-ci.yml` na raiz do seu projeto com o conteúdo abaixo. Isso construirá e implantará seu site sempre que você fizer alterações no conteúdo:
 
-   ```yaml
+   ```yaml [.gitlab-ci.yml]
    image: node:18
    pages:
      cache:
@@ -237,7 +239,7 @@ Não ative opções como _Auto Minify_ para código HTML. Isso removerá coment�
 
    `firebase.json`:
 
-   ```json
+   ```json [firebase.json]
    {
      "hosting": {
        "public": "docs/.vitepress/dist",
@@ -248,7 +250,7 @@ Não ative opções como _Auto Minify_ para código HTML. Isso removerá coment�
 
    `.firebaserc`:
 
-   ```json
+   ```json [.firebaserc]
    {
      "projects": {
        "default": "<SEU_ID_FIREBASE>"
@@ -276,7 +278,7 @@ Não ative opções como _Auto Minify_ para código HTML. Isso removerá coment�
 
 2. Crie um arquivo chamado `static.json` na raiz do seu projeto com o conteúdo abaixo:
 
-   ```json
+   ```json [static.json]
    {
      "root": "docs/.vitepress/dist"
    }
@@ -288,4 +290,4 @@ Consulte [Criar e Implantar um Aplicativo VitePress no Edgio](https://docs.edg.i
 
 ### Kinsta Static Site Hosting {#kinsta-static-site-hosting}
 
-Você pode implantar seu site Vitepress em [Kinsta](https://kinsta.com/static-site-hosting/) seguindo estas [instruções](https://kinsta.com/docs/vitepress-static-site-example/).
+Você pode implantar seu site VitePress em [Kinsta](https://kinsta.com/static-site-hosting/) seguindo estas [instruções](https://kinsta.com/docs/vitepress-static-site-example/).

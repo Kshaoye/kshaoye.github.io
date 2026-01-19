@@ -6,8 +6,8 @@
   },
   "files": [
     {
-      "location": ".vitepress/config/{en,zh,pt}.ts",
-      "pattern": ".vitepress/config/@lang.ts",
+      "location": "**/config.ts",
+      "pattern": "@lang/@path",
       "type": "universal"
     },
     {
@@ -28,6 +28,26 @@
     {
       "label": "Português",
       "lang": "pt"
+    },
+    {
+      "label": "Русский",
+      "lang": "ru"
+    },
+    {
+      "label": "Español",
+      "lang": "es"
+    },
+    {
+      "label": "한국어",
+      "lang": "ko"
+    },
+    {
+      "label": "فارسی",
+      "lang": "fa"
+    },
+    {
+      "label": "日本語",
+      "lang": "ja"
     }
   ],
   "outDir": ".vitepress/dist/_translations",

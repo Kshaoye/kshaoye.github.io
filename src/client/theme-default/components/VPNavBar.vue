@@ -1,8 +1,7 @@
 <script lang="ts" setup>
 import { useWindowScroll } from '@vueuse/core'
 import { ref, watchPostEffect } from 'vue'
-import { useData } from '../composables/data'
-import { useSidebar } from '../composables/sidebar'
+import { useLayout } from '../composables/layout'
 import VPNavBarAppearance from './VPNavBarAppearance.vue'
 import VPNavBarExtra from './VPNavBarExtra.vue'
 import VPNavBarHamburger from './VPNavBarHamburger.vue'
@@ -12,7 +11,7 @@ import VPNavBarSocialLinks from './VPNavBarSocialLinks.vue'
 import VPNavBarTitle from './VPNavBarTitle.vue'
 import VPNavBarTranslations from './VPNavBarTranslations.vue'
 
-defineProps<{
+const props = defineProps<{
   isScreenOpen: boolean
 }>()
 
@@ -21,16 +20,16 @@ defineEmits<{
 }>()
 
 const { y } = useWindowScroll()
-const { hasSidebar } = useSidebar()
-const { frontmatter } = useData()
+const { isHome, hasSidebar } = useLayout()
 
 const classes = ref<Record<string, boolean>>({})
 
 watchPostEffect(() => {
   classes.value = {
     'has-sidebar': hasSidebar.value,
-    'home': frontmatter.value.layout === 'home',
+    'home': isHome.value,
     'top': y.value === 0,
+    'screen-open': props.isScreenOpen
   }
 })
 </script>
@@ -74,7 +73,13 @@ watchPostEffect(() => {
   height: var(--vp-nav-height);
   pointer-events: none;
   white-space: nowrap;
-  transition: background-color 0.5s;
+  transition: background-color 0.25s;
+}
+
+.VPNavBar.screen-open {
+  transition: none;
+  background-color: var(--vp-nav-bg-color);
+  border-bottom: 1px solid var(--vp-c-divider);
 }
 
 .VPNavBar:not(.home) {
@@ -165,15 +170,15 @@ watchPostEffect(() => {
   .VPNavBar.has-sidebar .content {
     position: relative;
     z-index: 1;
-    padding-right: 32px;
     padding-left: var(--vp-sidebar-width);
+    padding-right: 32px;
   }
 }
 
 @media (min-width: 1440px) {
   .VPNavBar.has-sidebar .content {
-    padding-right: calc((100vw - var(--vp-layout-max-width)) / 2 + 32px);
-    padding-left: calc((100vw - var(--vp-layout-max-width)) / 2 + var(--vp-sidebar-width));
+    padding-left: calc((100% - var(--vp-layout-max-width)) / 2 + var(--vp-sidebar-width));
+    padding-right: calc((100% - var(--vp-layout-max-width)) / 2 + 32px);
   }
 }
 
@@ -193,6 +198,11 @@ watchPostEffect(() => {
 
   .VPNavBar:not(.has-sidebar):not(.home.top) .content-body {
     background-color: transparent;
+  }
+
+  .content-body {
+    margin-right: -100vw;
+    padding-right: 100vw;
   }
 }
 
@@ -241,7 +251,7 @@ watchPostEffect(() => {
 
 @media (min-width: 1440px) {
   .VPNavBar.has-sidebar .divider {
-    padding-left: calc((100vw - var(--vp-layout-max-width)) / 2 + var(--vp-sidebar-width));
+    padding-left: calc((100% - var(--vp-layout-max-width)) / 2 + var(--vp-sidebar-width));
   }
 }
 
@@ -255,7 +265,7 @@ watchPostEffect(() => {
   background-color: var(--vp-c-gutter);
 }
 
-@media (min-width: 960px) { 
+@media (min-width: 960px) {
   .VPNavBar:not(.home.top) .divider-line {
     background-color: var(--vp-c-gutter);
   }

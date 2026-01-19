@@ -1,13 +1,15 @@
 import { isBooleanAttr } from '@vue/shared'
-import escape from 'escape-html'
 import fs from 'fs-extra'
-import path from 'path'
-import { pathToFileURL } from 'url'
+import path from 'node:path'
+import { pathToFileURL } from 'node:url'
+import * as vite from 'vite'
 import { normalizePath, transformWithEsbuild, type Rollup } from 'vite'
+import { version } from '../../../package.json'
 import type { SiteConfig } from '../config'
 import {
   EXTERNAL_URL_RE,
   createTitle,
+  escapeHtml,
   mergeHead,
   notFoundPageData,
   resolveSiteDataByRoute,
@@ -17,7 +19,6 @@ import {
   type PageData,
   type SSGContext
 } from '../shared'
-import { version } from '../../../package.json'
 
 export async function renderPage(
   render: (path: string) => Promise<SSGContext>,
@@ -29,14 +30,19 @@ export async function renderPage(
   assets: string[],
   pageToHashMap: Record<string, string>,
   metadataScript: { html: string; inHead: boolean },
-  additionalHeadTags: HeadConfig[]
+  additionalHeadTags: HeadConfig[],
+  usedIcons: Set<string>
 ) {
   const routePath = `/${page.replace(/\.md$/, '')}`
-  const siteData = resolveSiteDataByRoute(config.site, routePath)
+  const siteData = resolveSiteDataByRoute(config.site, page)
 
   // render page
   const context = await render(routePath)
-  const { content, teleports } = (await config.postRender?.(context)) ?? context
+  const { content, teleports, vpSocialIcons } =
+    (await config.postRender?.(context)) ?? context
+
+  // add used social icons to the set
+  vpSocialIcons.forEach((icon) => usedIcons.add(icon))
 
   const pageName = sanitizeFileName(page.replace(/\//g, '_'))
   // server build doesn't need hash
@@ -52,11 +58,7 @@ export async function renderPage(
   try {
     // resolve page data so we can render head tags
     const { __pageData } = await import(
-      pathToFileURL(
-        path.join(config.tempDir, pageServerJsFileName)
-      ).toString() +
-        '?t=' +
-        Date.now()
+      pathToFileURL(path.join(config.tempDir, pageServerJsFileName)).href
     )
     pageData = __pageData
   } catch (e) {
@@ -163,7 +165,7 @@ export async function renderPage(
         ? ''
         : '<meta name="viewport" content="width=device-width,initial-scale=1">'
     }
-    <title>${title}</title>
+    <title>${escapeHtml(title)}</title>
     ${
       isDescriptionOverridden(head)
         ? ''
@@ -171,6 +173,7 @@ export async function renderPage(
     }
     <meta name="generator" content="VitePress v${version}">
     ${stylesheetLink}
+    <link rel="preload stylesheet" href="${siteData.base}vp-icons.css" as="style">
     ${metadataScript.inHead ? metadataScript.html : ''}
     ${
       appChunk
@@ -180,7 +183,7 @@ export async function renderPage(
     ${await renderHead(head)}
   </head>
   <body>${teleports?.body || ''}
-    <div id="app">${content}</div>
+    <div id="app">${page === '404.md' ? '' : content}</div>
     ${metadataScript.inHead ? '' : metadataScript.html}
     ${inlinedScript}
   </body>
@@ -226,9 +229,9 @@ function resolvePageImports(
   ) as Rollup.OutputChunk
   return [
     ...appChunk.imports,
-    ...appChunk.dynamicImports,
-    ...pageChunk.imports,
-    ...pageChunk.dynamicImports
+    // ...appChunk.dynamicImports,
+    ...pageChunk.imports
+    // ...pageChunk.dynamicImports
   ]
 }
 
@@ -241,11 +244,7 @@ async function renderHead(head: HeadConfig[]): Promise<string> {
           tag === 'script' &&
           (attrs.type === undefined || attrs.type.includes('javascript'))
         ) {
-          innerHTML = (
-            await transformWithEsbuild(innerHTML, 'inline-script.js', {
-              minify: true
-            })
-          ).code.trim()
+          innerHTML = await minifyScript(innerHTML, 'inline-script.js')
         }
         return `${openTag}${innerHTML}</${tag}>`
       } else {
@@ -260,9 +259,20 @@ function renderAttrs(attrs: Record<string, string>): string {
   return Object.keys(attrs)
     .map((key) => {
       if (isBooleanAttr(key)) return ` ${key}`
-      return ` ${key}="${escape(attrs[key] as string)}"`
+      return ` ${key}="${escapeHtml(attrs[key] as string)}"`
     })
     .join('')
+}
+
+async function minifyScript(code: string, filename: string): Promise<string> {
+  // @ts-ignore use oxc-minify when rolldown-vite is used
+  if (vite.rolldownVersion) {
+    const oxcMinify = await import('oxc-minify')
+    return (await oxcMinify.minify(filename, code)).code.trim()
+  }
+  return (
+    await transformWithEsbuild(code, filename, { minify: true })
+  ).code.trim()
 }
 
 function filterOutHeadDescription(head: HeadConfig[] = []) {
