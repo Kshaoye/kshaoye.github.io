@@ -1,0 +1,1 @@
+import{_ as a,c as r,o,ae as l}from"./chunks/framework.Ye1pS4Qu.js";const h=JSON.parse('{"title":"探针","description":"","frontmatter":{},"headers":[],"relativePath":"k8s/probe.md","filePath":"k8s/probe.md"}'),t={name:"k8s/probe.md"};function i(s,e,n,d,u,c){return o(),r("div",null,[...e[0]||(e[0]=[l("",10)])])}const P=a(t,[["render",i]]);export{h as __pageData,P as default};
