@@ -1,0 +1,1 @@
+import{_ as e,c as t,o as a}from"./chunks/framework.z0p7P-Mv.js";const m=JSON.parse('{"title":"","description":"","frontmatter":{},"headers":[],"relativePath":"zh/k8s/HPA.md","filePath":"zh/k8s/HPA.md"}'),s={name:"zh/k8s/HPA.md"};function r(o,c,n,p,_,d){return a(),t("div")}const f=e(s,[["render",r]]);export{m as __pageData,f as default};

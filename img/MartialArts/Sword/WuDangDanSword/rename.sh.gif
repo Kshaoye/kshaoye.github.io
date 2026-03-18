@@ -1,0 +1,27 @@
+#!/bin/bash
+
+# 开启安全模式
+set -e
+
+for file in *; do
+    # 跳过目录
+    if [ -d "$file" ]; then
+        continue
+    fi
+
+    # 判断是否已经是 .gif 结尾
+    if [[ "$file" != *.gif ]]; then
+        new_name="${file}.gif"
+
+        # 如果目标文件已存在则跳过，避免覆盖
+        if [ -e "$new_name" ]; then
+            echo "跳过: $new_name 已存在"
+            continue
+        fi
+
+        mv "$file" "$new_name"
+        echo "重命名: $file -> $new_name"
+    fi
+done
+
+echo "处理完成"
