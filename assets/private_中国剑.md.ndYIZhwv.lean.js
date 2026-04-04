@@ -1,0 +1,1 @@
+import{_ as e,c as t,o as a}from"./chunks/framework.z0p7P-Mv.js";const m=JSON.parse('{"title":"","description":"","frontmatter":{},"headers":[],"relativePath":"private/中国剑.md","filePath":"private/中国剑.md"}'),r={name:"private/中国剑.md"};function o(s,c,n,p,_,i){return a(),t("div")}const f=e(r,[["render",o]]);export{m as __pageData,f as default};

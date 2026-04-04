@@ -1,0 +1,1 @@
+import{_ as e,c as t,o}from"./chunks/framework.z0p7P-Mv.js";const d=JSON.parse('{"title":"","description":"","frontmatter":{},"headers":[],"relativePath":"zh/k8s/NetworkPolicy.md","filePath":"zh/k8s/NetworkPolicy.md"}'),r={name:"zh/k8s/NetworkPolicy.md"};function a(c,s,n,i,l,p){return o(),t("div")}const k=e(r,[["render",a]]);export{d as __pageData,k as default};

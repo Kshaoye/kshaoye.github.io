@@ -1,0 +1,1 @@
+import{_ as t,c as s,o as e}from"./chunks/framework.z0p7P-Mv.js";const d=JSON.parse('{"title":"","description":"","frontmatter":{},"headers":[],"relativePath":"zh/k8s/PriorityClass.md","filePath":"zh/k8s/PriorityClass.md"}'),r={name:"zh/k8s/PriorityClass.md"};function a(o,i,c,n,l,p){return e(),s("div")}const m=t(r,[["render",a]]);export{d as __pageData,m as default};

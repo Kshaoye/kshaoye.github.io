@@ -1,0 +1,1 @@
+import{_ as e,c as r,o as t}from"./chunks/framework.z0p7P-Mv.js";const i=JSON.parse('{"title":"","description":"","frontmatter":{},"headers":[],"relativePath":"zh/k8s/IngressController.md","filePath":"zh/k8s/IngressController.md"}'),s={name:"zh/k8s/IngressController.md"};function o(n,a,c,l,p,_){return t(),r("div")}const m=e(s,[["render",o]]);export{i as __pageData,m as default};
